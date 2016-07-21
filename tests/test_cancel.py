@@ -72,10 +72,10 @@ class CancelTests(ConnectingTestCase):
                 errors.append(e)
                 raise
 
-        thread1 = threading.Thread(target=neverending, args=(self.conn, ))
+        thread1 = threading.Thread(target=neverending, args=(self.conn,))
         # wait a bit to make sure that the other thread is already in
         # pg_sleep -- ugly and racy, but the chances are ridiculously low
-        thread2 = threading.Timer(0.3, canceller, args=(self.conn, ))
+        thread2 = threading.Timer(0.3, canceller, args=(self.conn,))
         thread1.start()
         thread2.start()
         thread1.join()

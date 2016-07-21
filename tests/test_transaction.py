@@ -191,7 +191,7 @@ class DeadlockSerializationTests(ConnectingTestCase):
                 step2.wait()
                 curs.execute("UPDATE table1 SET name='task1' WHERE id = 1")
                 conn.commit()
-            except psycopg2.DatabaseError, exc:
+            except psycopg2.DatabaseError as exc:
                 self.thread1_error = exc
                 step1.set()
             conn.close()
@@ -202,7 +202,7 @@ class DeadlockSerializationTests(ConnectingTestCase):
                 step1.wait()
                 curs.execute("UPDATE table1 SET name='task2' WHERE id = 1")
                 conn.commit()
-            except psycopg2.DatabaseError, exc:
+            except psycopg2.DatabaseError as exc:
                 self.thread2_error = exc
             step2.set()
             conn.close()

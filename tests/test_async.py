@@ -23,16 +23,16 @@
 # FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
 # License for more details.
 
+import select
+import time
+from io import StringIO
+
 from testutils import unittest, skip_before_postgres
+from testutils import ConnectingTestCase
 
 import psycopg2
 from psycopg2 import extensions
 
-import time
-import select
-import StringIO
-
-from testutils import ConnectingTestCase
 
 class PollableStub(object):
     """A 'pollable' wrapper allowing analysis of the `poll()` calls."""
@@ -438,14 +438,14 @@ class AsyncTests(ConnectingTestCase):
     def test_async_cursor_gone(self):
         import gc
         cur = self.conn.cursor()
-        cur.execute("select 42;");
+        cur.execute("select 42;")
         del cur
         gc.collect()
         self.assertRaises(psycopg2.InterfaceError, self.wait, self.conn)
 
         # The connection is still usable
         cur = self.conn.cursor()
-        cur.execute("select 42;");
+        cur.execute("select 42;")
         self.wait(self.conn)
         self.assertEqual(cur.fetchone(), (42,))
 
@@ -453,9 +453,9 @@ class AsyncTests(ConnectingTestCase):
         try:
             cnn = psycopg2.connect('dbname=thisdatabasedoesntexist', async=True)
             self.wait(cnn)
-        except psycopg2.Error, e:
+        except psycopg2.Error as e:
             self.assertNotEqual(str(e), "asynchronous connection failed",
-                "connection error reason lost")
+                                "connection error reason lost")
         else:
             self.fail("no exception raised")
 

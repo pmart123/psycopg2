@@ -71,10 +71,12 @@ import sys
 #   nothing
 # - Fix bugs in test_setoutputsize_basic and test_setinputsizes
 #
+
 def str2bytes(sval):
-    if sys.version_info < (3,0) and isinstance(sval, str):
+    if sys.version_info < (3, 0) and isinstance(sval, str):
         sval = sval.decode("latin1")
     return sval.encode("latin1")
+
 
 class DatabaseAPI20Test(unittest.TestCase):
     ''' Test a database self.driver for DB API 2.0 compatibility.
@@ -110,14 +112,14 @@ class DatabaseAPI20Test(unittest.TestCase):
     xddl1 = 'drop table %sbooze' % table_prefix
     xddl2 = 'drop table %sbarflys' % table_prefix
 
-    lowerfunc = 'lower' # Name of stored procedure to convert string->lowercase
+    lowerfunc = 'lower'  # Name of stored procedure to convert string->lowercase
         
     # Some drivers may need to override these helpers, for example adding
     # a 'commit' after the execute.
-    def executeDDL1(self,cursor):
+    def executeDDL1(self, cursor):
         cursor.execute(self.ddl1)
 
-    def executeDDL2(self,cursor):
+    def executeDDL2(self, cursor):
         cursor.execute(self.ddl2)
 
     def setUp(self):

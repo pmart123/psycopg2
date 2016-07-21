@@ -22,17 +22,17 @@
 # FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
 # License for more details.
 
+import sys
+import time
+import select
+from subprocess import Popen, PIPE
+
 from testutils import unittest
 
 import psycopg2
 from psycopg2 import extensions
 from testutils import ConnectingTestCase, script_to_py3
 from testconfig import dsn
-
-import sys
-import time
-import select
-from subprocess import Popen, PIPE
 
 
 class NotifiesTests(ConnectingTestCase):
@@ -143,7 +143,7 @@ conn.close()
     def test_notify_payload(self):
         if self.conn.server_version < 90000:
             return self.skipTest("server version %s doesn't support notify payload"
-                % self.conn.server_version)
+                                 % self.conn.server_version)
         self.autocommit(self.conn)
         self.listen('foo')
         pid = int(self.notify('foo', payload="Hello, world!").communicate()[0])
@@ -211,7 +211,7 @@ conn.close()
         from psycopg2.extensions import Notify
         self.assertEqual(hash((10, 'foo')), hash(Notify(10, 'foo')))
         self.assertNotEqual(hash(Notify(10, 'foo', 'bar')),
-            hash(Notify(10, 'foo')))
+                            hash(Notify(10, 'foo')))
 
 
 def test_suite():

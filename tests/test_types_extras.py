@@ -37,6 +37,7 @@ def filter_scs(conn, s):
     else:
         return s.replace(b("E'"), b("'"))
 
+
 class TypesExtrasTests(ConnectingTestCase):
     """Test that all type conversions are working."""
 
@@ -60,7 +61,8 @@ class TypesExtrasTests(ConnectingTestCase):
     def testUUIDARRAY(self):
         import uuid
         psycopg2.extras.register_uuid()
-        u = [uuid.UUID('9c6d5a77-7256-457e-9461-347b4358e350'), uuid.UUID('9c6d5a77-7256-457e-9461-347b4358e352')]
+        u = [uuid.UUID('9c6d5a77-7256-457e-9461-347b4358e350'),
+             uuid.UUID('9c6d5a77-7256-457e-9461-347b4358e352')]
         s = self.execute("SELECT %s AS foo", (u,))
         self.failUnless(u == s)
         # array with a NULL element
@@ -115,7 +117,7 @@ class TypesExtrasTests(ConnectingTestCase):
             psycopg2.extensions.adapt, Foo(), ext.ISQLQuote, None)
         try:
             psycopg2.extensions.adapt(Foo(), ext.ISQLQuote, None)
-        except psycopg2.ProgrammingError, err:
+        except psycopg2.ProgrammingError as err:
             self.failUnless(str(err) == "can't adapt type 'Foo'")
 
 
@@ -129,6 +131,7 @@ def skip_if_no_hstore(f):
         return f(self)
 
     return skip_if_no_hstore_
+
 
 class HstoreTestCase(ConnectingTestCase):
     def test_adapt_8(self):
@@ -415,8 +418,7 @@ class HstoreTestCase(ConnectingTestCase):
 
     @skip_if_no_hstore
     def test_non_dbapi_connection(self):
-        from psycopg2.extras import RealDictConnection
-        from psycopg2.extras import register_hstore
+        from psycopg2.extras import RealDictConnection, register_hstore
 
         conn = self.connect(connection_factory=RealDictConnection)
         try:
@@ -448,6 +450,7 @@ def skip_if_no_composite(f):
         return f(self)
 
     return skip_if_no_composite_
+
 
 class AdaptTypeTestCase(ConnectingTestCase):
     @skip_if_no_composite
@@ -858,6 +861,7 @@ class JsonTestCase(ConnectingTestCase):
     @skip_if_json_module
     def test_customizable_with_module_not_available(self):
         from psycopg2.extras import Json
+
         class MyJson(Json):
             def dumps(self, obj):
                 assert obj is None
@@ -1414,7 +1418,7 @@ def skip_if_no_range(f):
 class RangeCasterTestCase(ConnectingTestCase):
 
     builtin_ranges = ('int4range', 'int8range', 'numrange',
-        'daterange', 'tsrange', 'tstzrange')
+                      'daterange', 'tsrange', 'tstzrange')
 
     def test_cast_null(self):
         cur = self.conn.cursor()
@@ -1446,8 +1450,8 @@ class RangeCasterTestCase(ConnectingTestCase):
     def test_cast_numbers(self):
         from psycopg2.extras import NumericRange
         cur = self.conn.cursor()
-        for type in ('int4range', 'int8range'):
-            cur.execute("select '(10,20)'::%s" % type)
+        for type_ in ('int4range', 'int8range'):
+            cur.execute("select '(10,20)'::%s" % type_)
             r = cur.fetchone()[0]
             self.assert_(isinstance(r, NumericRange))
             self.assert_(not r.isempty)
@@ -1577,7 +1581,7 @@ class RangeCasterTestCase(ConnectingTestCase):
         from psycopg2.tz import FixedOffsetTimezone
         cur = self.conn.cursor()
 
-        d1 = date(2012, 01, 01)
+        d1 = date(2012, 1, 1)
         d2 = date(2012, 12, 31)
         r = DateRange(d1, d2)
         cur.execute("select %s", (r,))
@@ -1594,8 +1598,8 @@ class RangeCasterTestCase(ConnectingTestCase):
         self.assert_(isinstance(r1, DateTimeRange))
         self.assert_(r1.isempty)
 
-        ts1 = datetime(2000,1,1, tzinfo=FixedOffsetTimezone(600))
-        ts2 = datetime(2000,12,31,23,59,59,999, tzinfo=FixedOffsetTimezone(600))
+        ts1 = datetime(2000, 1, 1, tzinfo=FixedOffsetTimezone(600))
+        ts2 = datetime(2000, 12, 31, 23, 59, 59, 999, tzinfo=FixedOffsetTimezone(600))
         r = DateTimeTZRange(ts1, ts2, '(]')
         cur.execute("select %s", (r,))
         r1 = cur.fetchone()[0]
@@ -1647,12 +1651,11 @@ class RangeCasterTestCase(ConnectingTestCase):
                 id integer primary key,
                 range textrange)""")
 
-        bounds = [ '[)', '(]', '()', '[]' ]
-        ranges = [ TextRange(low, up, bounds[i % 4])
-            for i, (low, up) in enumerate(zip(
-                [None] + map(chr, range(1, 128)),
-                map(chr, range(1,128)) + [None],
-                ))]
+        bounds = ['[)', '(]', '()', '[]']
+        ranges = [
+            TextRange(low, up, bounds[i % 4]) for i, (low, up) in enumerate(
+                zip([None] + map(chr, range(1, 128)), map(chr, range(1, 128)) + [None],)
+            )]
         ranges.append(TextRange())
         ranges.append(TextRange(empty=True))
 
@@ -1715,11 +1718,11 @@ class RangeCasterTestCase(ConnectingTestCase):
             rars2.typecaster.values[0])
 
         self.assertRaises(psycopg2.ProgrammingError,
-            register_range, 'r3', 'FailRange', cur)
+                          register_range, 'r3', 'FailRange', cur)
         cur.execute("rollback to savepoint x;")
 
         self.assertRaises(psycopg2.ProgrammingError,
-            register_range, 'rs.r1', 'FailRange', cur)
+                          register_range, 'rs.r1', 'FailRange', cur)
         cur.execute("rollback to savepoint x;")
 
         # clear the adapters to allow precise count by scripts/refcounter.py

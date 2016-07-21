@@ -30,6 +30,7 @@ import psycopg2
 
 from testconfig import dsn
 
+
 class Psycopg2Tests(dbapi20.DatabaseAPI20Test):
     driver = psycopg2
     connect_args = ()

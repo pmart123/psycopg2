@@ -30,6 +30,7 @@ import psycopg2.extensions as ext
 
 from testutils import unittest, ConnectingTestCase
 
+
 class WithTestCase(ConnectingTestCase):
     def setUp(self):
         ConnectingTestCase.setUp(self)
@@ -113,6 +114,7 @@ class WithConnectionTestCase(WithTestCase):
 
     def test_subclass_commit(self):
         commits = []
+
         class MyConn(ext.connection):
             def commit(self):
                 commits.append(None)
@@ -131,6 +133,7 @@ class WithConnectionTestCase(WithTestCase):
 
     def test_subclass_rollback(self):
         rollbacks = []
+
         class MyConn(ext.connection):
             def rollback(self):
                 rollbacks.append(None)
@@ -189,6 +192,7 @@ class WithCursorTestCase(WithTestCase):
 
     def test_subclass(self):
         closes = []
+
         class MyCurs(ext.cursor):
             def close(self):
                 closes.append(None)
@@ -208,7 +212,7 @@ class WithCursorTestCase(WithTestCase):
                 with conn.cursor('named') as cur:
                     cur.execute("select 1/0")
                     cur.fetchone()
-        except psycopg2.DataError, e:
+        except psycopg2.DataError as e:
             self.assertEqual(e.pgcode, '22012')
         else:
             self.fail("where is my exception?")

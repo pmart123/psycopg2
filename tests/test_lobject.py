@@ -33,6 +33,7 @@ from psycopg2.extensions import b
 from testutils import unittest, decorate_all_tests, skip_if_tpc_disabled
 from testutils import ConnectingTestCase, skip_if_green
 
+
 def skip_if_no_lo(f):
     @wraps(f)
     def skip_if_no_lo_(self):
@@ -202,7 +203,7 @@ class LargeObjectTests(LargeObjectTestCase):
         data1 = lo.read()
         # avoid dumping megacraps in the console in case of error
         self.assert_(data == data1,
-            "%r... != %r..." % (data[:100], data1[:100]))
+                     "%r... != %r..." % (data[:100], data1[:100]))
 
     def test_seek_tell(self):
         lo = self.conn.lobject()
@@ -400,6 +401,7 @@ def skip_if_no_truncate(f):
 
     return skip_if_no_truncate_
 
+
 class LargeObjectTruncateTests(LargeObjectTestCase):
     def test_truncate(self):
         lo = self.conn.lobject()
@@ -437,7 +439,7 @@ class LargeObjectTruncateTests(LargeObjectTestCase):
         self.assertRaises(psycopg2.ProgrammingError, lo.truncate)
 
 decorate_all_tests(LargeObjectTruncateTests,
-    skip_if_no_lo, skip_lo_if_green, skip_if_no_truncate)
+                   skip_if_no_lo, skip_lo_if_green, skip_if_no_truncate)
 
 
 def _has_lo64(conn):
@@ -451,12 +453,16 @@ def _has_lo64(conn):
 
     return (True, "this server and build support the lo64 API")
 
+
 def skip_if_no_lo64(f):
     @wraps(f)
     def skip_if_no_lo64_(self):
         lo64, msg = _has_lo64(self.conn)
-        if not lo64: return self.skipTest(msg)
-        else: return f(self)
+
+        if not lo64:
+            return self.skipTest(msg)
+        else:
+            return f(self)
 
     return skip_if_no_lo64_
 
@@ -470,18 +476,21 @@ class LargeObject64Tests(LargeObjectTestCase):
         self.assertEqual(lo.seek(length, 0), length)
         self.assertEqual(lo.tell(), length)
 
-decorate_all_tests(LargeObject64Tests,
-    skip_if_no_lo, skip_lo_if_green, skip_if_no_truncate, skip_if_no_lo64)
+decorate_all_tests(LargeObject64Tests, skip_if_no_lo, skip_lo_if_green,
+                   skip_if_no_truncate, skip_if_no_lo64)
 
 
 def skip_if_lo64(f):
     @wraps(f)
     def skip_if_lo64_(self):
         lo64, msg = _has_lo64(self.conn)
-        if lo64: return self.skipTest(msg)
-        else: return f(self)
+        if lo64:
+            return self.skipTest(msg)
+        else:
+            return f(self)
 
     return skip_if_lo64_
+
 
 class LargeObjectNot64Tests(LargeObjectTestCase):
     def test_seek_larger_than_2gb(self):
@@ -498,8 +507,8 @@ class LargeObjectNot64Tests(LargeObjectTestCase):
             (OverflowError, psycopg2.InterfaceError, psycopg2.NotSupportedError),
             lo.truncate, length)
 
-decorate_all_tests(LargeObjectNot64Tests,
-    skip_if_no_lo, skip_lo_if_green, skip_if_no_truncate, skip_if_lo64)
+decorate_all_tests(LargeObjectNot64Tests, skip_if_no_lo, skip_lo_if_green,
+                   skip_if_no_truncate, skip_if_lo64)
 
 
 def test_suite():

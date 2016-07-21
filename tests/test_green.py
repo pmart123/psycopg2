@@ -29,6 +29,7 @@ import psycopg2.extras
 
 from testutils import ConnectingTestCase
 
+
 class ConnectionStub(object):
     """A `connection` wrapper allowing analysis of the `poll()` calls."""
     def __init__(self, conn):
@@ -42,6 +43,7 @@ class ConnectionStub(object):
         rv = self.conn.poll()
         self.polls.append(rv)
         return rv
+
 
 class GreenTestCase(ConnectingTestCase):
     def setUp(self):
